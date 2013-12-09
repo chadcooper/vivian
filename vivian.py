@@ -26,7 +26,7 @@ import calendar
 import Image
 import traceback
 import re
-import EXIF
+import exifread
 import os
 import shutil
 from time import localtime, strftime
@@ -55,7 +55,7 @@ def RenameFile(base, filename, rawFolder):
         # Open file, get EXIF tags, get date string and focal length
         os.chdir(rawFolder)
         f = open(filename, 'rb')
-        tags = EXIF.process_file(f)
+        tags = exifread.process_file(f)
         datestr = str(tags['EXIF DateTimeDigitized'])
         # Focal length
         focalLen = str(tags['EXIF FocalLength'])
@@ -107,8 +107,9 @@ def RenameFile(base, filename, rawFolder):
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
     
-    FilePic(rawFolder, base, filename, newName, y, m, d)
-    AddDateInfoKeywords(rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen)
+    im_name = FilePic(rawFolder, base, filename, newName, y, m, d)
+    print "im_name" + im_name
+    AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen)
     WriteByLine(base, newName, y, m, d)
 
    
@@ -125,7 +126,7 @@ def GetLensType(rawFolder, filename):
     if filename[:3] == 'DSC':
         os.chdir(rawFolder)
         f = open(filename, 'rb')
-        tags = EXIF.process_file(f)
+        tags = exifread.process_file(f)
         lensMinMaxFocal = str(tags['MakerNote LensMinMaxFocalMaxAperture'])
         if re.match('.18',lensMinMaxFocal) != None and re.search('.*\s70',lensMinMaxFocal) != None :
             lensName = '18-70mm f/3.5-4.5G'
@@ -182,6 +183,7 @@ def FilePic(rawFolder, base, filename, newName, y, m, d):
         pymsg = "PYTHON ERRORS:\nTraceback Info:\n" + tbinfo + "\nError Info:\n    " + \
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
+    return imageName
     print 'New home: ', imageName, '\n'
     
 def WriteByLine(base, newName, y, m, d):
@@ -216,7 +218,7 @@ def WriteByLine(base, newName, y, m, d):
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
 
-def AddDateInfoKeywords(rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen):
+def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen):
     """
     Adds keywords for year, month, and date image was take to jpegs
     Date data acquired from EXIF via exif.py module
@@ -232,8 +234,7 @@ def AddDateInfoKeywords(rawFolder, filename, base, newName, y, m, d, hr, ampm, f
     --------------------------------------------------------------------------
     """
     try:
-        print y, m, d
-        info = IPTCInfo(os.path.join(base, y, m, d, newName))
+        info = IPTCInfo(im_name)
         # Day of week
         intY = int(y)
         intM = int(m)
@@ -244,8 +245,6 @@ def AddDateInfoKeywords(rawFolder, filename, base, newName, y, m, d, hr, ampm, f
         day = dict[dd]
         # Friendly time of day
         tod = TimeOfDay(hr, ampm)
-        # Average RGB value of pic
-        #rgb = 'rgb' + str(GetRgb(rawFolder, filename))
         # Lens name
         lens = GetLensType(rawFolder, filename)
         # Focal length
@@ -332,28 +331,6 @@ def Timer(start, end):
         hour = elapsed / 3600
         time = str(round(hour,2)) + " hours\n"
     return time
-
-def GetRgb(rawFolder, filename):
-    """
-    Resizes the image down to one pixel in size, then returns a tuple of the 
-    RGB values of that pixel. Gives an average RGB value for our image. Might
-    be good for something one day.
-    ---------------------------------------------------------------------------------------------
-    Inputs:
-    rawFolder:    Folder where our raw imported files are
-    filename:     Image we are processing
-    ---------------------------------------------------------------------------------------------
-    """
-    try:
-        i=Image.open(os.path.join(rawFolder, filename))
-        rgb = i.quantize(1).convert('RGB').getpixel((0, 0))    
-        return rgb
-    except:
-        tb = sys.exc_info()[2]
-        tbinfo = traceback.format_tb(tb)[0]
-        pymsg = "PYTHON ERRORS:\nTraceback Info:\n" + tbinfo + "\nError Info:\n    " + \
-                str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
-        print pymsg
 
 ##### RUN #####
 
