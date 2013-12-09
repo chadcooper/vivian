@@ -19,7 +19,16 @@ Changelog:      2006-09-11: Script finalized and out of testing.
 ---------------------------------------------------------------------------------------------------
 """
 
-import string, time, sys, calendar, Image, traceback, re, EXIF, os, shutil
+import string
+import time
+import sys
+import calendar
+import Image
+import traceback
+import re
+import EXIF
+import os
+import shutil
 from time import localtime, strftime
 from IPTC import IPTCInfo
  
