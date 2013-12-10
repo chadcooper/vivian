@@ -1,24 +1,3 @@
-"""
----------------------------------------------------------------------------------------------------
-Filename:       renameCopyPhotos.py
-Author:         Chad Cooper
-Date:           2006-09-11
-Description:    Iterates through a directory, reading the EXIF data from each jpg. Parses the
-                date/time and focal length from EXIF data, renames the photo using the date/time
-                and focal length. Copies photo to a directory based on the date, ie 2006/09/11.
-                Adds date-related keywords to photo, determines by-line based on camera used, adds
-                average RGB code of image as a tuple keyword.
-
-Changelog:      2006-09-11: Script finalized and out of testing.
-                2007-01-10: Everything wrapped into functions. Functions for adding by-line and
-                date info keywords added.
-                2007-01-18: Added error handling to all functions and added Timer() function
-                2007-01-28: Wrapped lens determination into GetLensType() function
-                2007-02-12: Added focal length as keyword
-                2007-03-12: Fixed focal length to calculate fractional focal lengths in HP EXIF
----------------------------------------------------------------------------------------------------
-"""
-
 import string
 import time
 import sys
@@ -48,7 +27,6 @@ def RenameFile(base, filename, rawFolder):
     rawFolder:   Temp directory where images are transferred to from camera
     --------------------------------------------------------------------------    
     """
-    print 'Original filename: ', filename
     try:
         picNumber = filename[len(filename)-8:len(filename)-4]
         
@@ -99,7 +77,6 @@ def RenameFile(base, filename, rawFolder):
         # Establish new filename in form of:
         # 0000_yyyy-mm-dd_hh-mm-ss_00mm.jpg
         newName = picNumber + '_' + dt.replace(':', '-') + '_' + tm.replace(':', '-') + '_' + focalLen + 'mm.jpg'
-        print 'NewName: ', newName
     except:
         tb = sys.exc_info()[2]
         tbinfo = traceback.format_tb(tb)[0]
@@ -108,7 +85,6 @@ def RenameFile(base, filename, rawFolder):
         print pymsg
     
     im_name = FilePic(rawFolder, base, filename, newName, y, m, d)
-    print "im_name" + im_name
     AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen)
     WriteByLine(base, newName, y, m, d)
 
@@ -184,7 +160,6 @@ def FilePic(rawFolder, base, filename, newName, y, m, d):
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
     return imageName
-    print 'New home: ', imageName, '\n'
     
 def WriteByLine(base, newName, y, m, d):
     """
@@ -311,37 +286,9 @@ def TimeOfDay(hour, ampm):
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
 
-def Timer(start, end):
-    """
-    Calculates the time it takes to run a process, based on start and finish times
-    ---------------------------------------------------------------------------------------------
-    Inputs:
-    start:        Start time of process
-    end:          End time of process
-    ---------------------------------------------------------------------------------------------
-    """
-    elapsed = end - start
-    # Convert process time, if needed
-    if elapsed <= 59:
-        time = str(round(elapsed,2)) + " seconds\n"
-    if elapsed >= 60 and elapsed <= 3590:
-        min = elapsed / 60
-        time = str(round(min,2)) + " minutes\n"
-    if elapsed >= 3600:
-        hour = elapsed / 3600
-        time = str(round(hour,2)) + " hours\n"
-    return time
-
-##### RUN #####
-
 if __name__ == '__main__':
-    start = time.clock()
     for file in filelist:
         filename = os.path.basename(file)
         if filename[-4:] == fileExt:
             RenameFile(base, filename, rawFolder)                    
-            count = count + 1
-    finish = time.clock()
-    
-    print '\nProcessing done in ', Timer(start, finish)
-    print 'Images processed: ', str(count)
+        
