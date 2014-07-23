@@ -163,49 +163,6 @@ def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
 
-def TimeOfDay(hour, ampm):
-    try:
-        if ampm == 'PM':
-            hour = int(hour) + 12
-        else:
-            hour = int(hour)
-        # Get our human-friendly time of day
-        if hour < 4:
-            tod = 'the wee hours'
-        elif hour >= 4 and hour <= 6:
-            tod = 'terribly early in the morning'
-        elif hour >=7 and hour <= 9:
-            tod = 'early morning'
-        elif hour == 10:
-            tod = 'mid-morning'
-        elif hour == 11:
-            tod = 'late morning'
-        elif hour ==12:
-            tod = 'noon hour'
-        elif hour >= 13 and hour <= 14:
-            tod = 'early afternoon'
-        elif hour >= 15 and hour <= 16:
-            tod = 'mid-afternoon'
-        elif hour == 17:
-            tod = 'late afternoon'
-        elif hour >= 18 and hour <= 19:
-            tod = 'early evening'
-        elif hour >= 20 and hour <= 21:
-            tod = 'evening time'
-        elif hour == 22:
-            tod = 'late evening'
-        elif hour == 23:
-            tod = 'late at night'
-        else:
-            tod = ''
-        return tod
-    except:
-        tb = sys.exc_info()[2]
-        tbinfo = traceback.format_tb(tb)[0]
-        pymsg = "PYTHON ERRORS:\nTraceback Info:\n" + tbinfo + "\nError Info:\n    " + \
-                str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
-        print pymsg
-
 if __name__ == '__main__':
     for file in filelist:
         filename = os.path.basename(file)
