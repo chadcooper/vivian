@@ -1,14 +1,10 @@
-import string
-import time
 import sys
 import calendar
-import Image
 import traceback
 import re
 import exifread
 import os
 import shutil
-from time import localtime, strftime
 from IPTC import IPTCInfo
  
 base = '/Users/chad/Pictures'  # base dir 
