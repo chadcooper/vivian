@@ -147,8 +147,6 @@ def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr
         dict = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',
                 5:'Saturday',6:'Sunday'}
         day = dict[dd]
-        # Friendly time of day
-        tod = TimeOfDay(hr, ampm)
         # Lens name
         lens = GetLensType(rawFolder, filename)
         # Focal length
