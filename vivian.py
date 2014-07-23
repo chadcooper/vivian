@@ -22,15 +22,6 @@ def RenameFile(base, filename, rawFolder):
         f = open(filename, 'rb')
         tags = exifread.process_file(f)
         datestr = str(tags['EXIF DateTimeDigitized'])
-        # Focal length
-        focalLen = str(tags['EXIF FocalLength'])
-        # Determine if focal length is fractional and not integer
-        if focalLen.find('/') != -1:
-            # If fractional, split into two halves and do the math to get an integer
-            f1 = focalLen.split('/')
-            focalLen = str(int(round(float(f1[0])/float(f1[1]))))
-        else:
-            focalLen = focalLen
        
         # Start parsing EXIF tags we just grabbed
         datestr = datestr.split(' ')
@@ -95,10 +86,8 @@ def FilePic(rawFolder, base, filename, newName, y, m, d):
     return imageName
 
 
-def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen):
+def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm):
     try:
-        info = IPTCInfo(im_name)
-        # Day of week
         intY = int(y)
         intM = int(m)
         intD = int(d)
@@ -106,11 +95,6 @@ def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr
         dict = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',
                 5:'Saturday',6:'Sunday'}
         day = dict[dd]
-        # Focal length
-        fc = focalLen + 'mm'
-        # Write our keywords to image
-        info.keywords.extend(['y' + str(y), 'm' + str(m), 'd' + str(d), day, ampm, tod, lens, fc])
-        info.saveAs(os.path.join(base, str(y), str(m), str(d), newName))
     except:
         tb = sys.exc_info()[2]
         tbinfo = traceback.format_tb(tb)[0]
