@@ -73,7 +73,6 @@ def RenameFile(base, filename, rawFolder):
     
     im_name = FilePic(rawFolder, base, filename, newName, y, m, d)
     AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen)
-    WriteByLine(base, newName, y, m, d)
 
    
 def GetLensType(rawFolder, filename):
@@ -116,25 +115,7 @@ def FilePic(rawFolder, base, filename, newName, y, m, d):
                 str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
         print pymsg
     return imageName
-    
-def WriteByLine(base, newName, y, m, d):
-    try:
-        info = IPTCInfo(os.path.join(base, y, m, d, newName))
-        # Test to see who took the pic, depending on the camera
-        if filename[:2] == 'HP':
-            info.data['by-line'] = 'William L.R. Booher'
-            #info.data['keywords'] = ['taken by will']
-        elif filename[:3] == 'DSC':
-            info.data['by-line'] = 'Chad D. Cooper'
-        else:
-            info.data['by-line'] = ''
-        info.saveAs(os.path.join(base, y, m, d, newName))
-    except:
-        tb = sys.exc_info()[2]
-        tbinfo = traceback.format_tb(tb)[0]
-        pymsg = "PYTHON ERRORS:\nTraceback Info:\n" + tbinfo + "\nError Info:\n    " + \
-                str(sys.exc_type)+ ": " + str(sys.exc_value) + "\n"
-        print pymsg
+
 
 def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen):
     try:
