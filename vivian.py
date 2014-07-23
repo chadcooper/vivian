@@ -14,15 +14,6 @@ filelist = os.listdir(rawFolder)
 count = 0
 
 def RenameFile(base, filename, rawFolder):
-    """
-    Grabs EXIF tags and renames file based on DateTimeDigitized tag info
-    --------------------------------------------------------------------------
-    Inputs:
-    base:        Base directory for photos --> '/Users/chad/Pictures/testing'
-    filename:    Old filename of raw file from camera --> 'DSC_0001.jpg'
-    rawFolder:   Temp directory where images are transferred to from camera
-    --------------------------------------------------------------------------    
-    """
     try:
         picNumber = filename[len(filename)-8:len(filename)-4]
         
@@ -86,15 +77,6 @@ def RenameFile(base, filename, rawFolder):
 
    
 def GetLensType(rawFolder, filename):
-    """
-    For D70 images, parse the MakerNotes LensMinMaxFocal tag and figure out
-    which lens of mine was used, based on the max/min focal length
-    --------------------------------------------------------------------------
-    Inputs:
-    rawFolder:   Temp directory where images are transferred to from camera
-    filename:    Old filename of raw file from camera --> 'DSC_0001.jpg'
-    --------------------------------------------------------------------------
-    """
     if filename[:3] == 'DSC':
         os.chdir(rawFolder)
         f = open(filename, 'rb')
@@ -117,28 +99,6 @@ def GetLensType(rawFolder, filename):
 
    
 def FilePic(rawFolder, base, filename, newName, y, m, d): 
-    """
-    Files the input image according to date taken --> 2006/07/09
-    /Users
-      /Chad
-        /Pictures
-          /2006
-            /07
-              /09
-                image goes here
-    --------------------------------------------------------------------------
-    Inputs:
-    rawFolder:   Temp directory where images are transferred to from camera
-    base:        Base directory for photos --> '/Users/chad/Pictures/testing'
-    filename:    Old filename of raw file from camera --> 'DSC_0001.jpg'
-    newName :    New filename as result of RenameFile --> 0000_yyyy-mm-dd_hh-mm-ss_00mm.jpg
-    y:           Year from DateTimeDigitized Exif tag
-    m:           Month from DateTimeDigitized Exif tag
-    d:           Day from DateTimeDigitized Exif tag
-    --------------------------------------------------------------------------    
-    """
-    # Check for/make dirs for file to go into
-    # If dir already exists, use it - if it doesn't exist, then create it
     try:
         if os.path.isdir(base + '/' + y) != 1:
             os.mkdir(base + '/' + y)
@@ -158,19 +118,6 @@ def FilePic(rawFolder, base, filename, newName, y, m, d):
     return imageName
     
 def WriteByLine(base, newName, y, m, d):
-    """
-    Writes author info to the IPTC metadata of jpeg. Does test on original filename
-    to see which camera it came from, if Nikon, I took it with my D70; if HP, 
-    Will took it with his camera
-    --------------------------------------------------------------------------
-    Inputs:
-    base:        Base directory for photos --> '/Users/chad/Pictures/testing'
-    newName :    New filename as result of RenameFile --> 0000_yyyy-mm-dd_hh-mm-ss_00mm.jpg
-    y:           Year from DateTimeDigitized Exif tag
-    m:           Month from DateTimeDigitized Exif tag
-    d:           Day from DateTimeDigitized Exif tag
-    --------------------------------------------------------------------------    
-    """
     try:
         info = IPTCInfo(os.path.join(base, y, m, d, newName))
         # Test to see who took the pic, depending on the camera
@@ -190,20 +137,6 @@ def WriteByLine(base, newName, y, m, d):
         print pymsg
 
 def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen):
-    """
-    Adds keywords for year, month, and date image was take to jpegs
-    Date data acquired from EXIF via exif.py module
-    Adds them as a list appendage, as in:
-        info.keyword.extend(['y'+y, 'm'+m, 'd'+d, dd])
-    --------------------------------------------------------------------------
-    Inputs:
-    base:        Base directory for photos --> '/Users/chad/Pictures/testing'
-    newName :    New filename as result of RenameFile --> 0000_yyyy-mm-dd_hh-mm-ss_00mm.jpg
-    y:           Year from DateTimeDigitized Exif tag
-    m:           Month from DateTimeDigitized Exif tag
-    d:           Day from DateTimeDigitized Exif tag
-    --------------------------------------------------------------------------
-    """
     try:
         info = IPTCInfo(im_name)
         # Day of week
@@ -231,15 +164,6 @@ def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr
         print pymsg
 
 def TimeOfDay(hour, ampm):
-    """
-    From 24 hour time, take the hour and create a human-friendly tag telling us what period
-    of the day the photo was taken. Adapted from Dunstan Orchards PHP function at:
-    http://1976design.com/blog/archive/2004/07/23/redesign-time-presentation/
-    --------------------------------------------------------------------------
-    Inputs:
-    hour:        Hour, in 24-hour format, our pic was shot
-    --------------------------------------------------------------------------    
-    """
     try:
         if ampm == 'PM':
             hour = int(hour) + 12
