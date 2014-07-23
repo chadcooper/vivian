@@ -75,28 +75,6 @@ def RenameFile(base, filename, rawFolder):
     AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr, ampm, focalLen)
 
    
-def GetLensType(rawFolder, filename):
-    if filename[:3] == 'DSC':
-        os.chdir(rawFolder)
-        f = open(filename, 'rb')
-        tags = exifread.process_file(f)
-        lensMinMaxFocal = str(tags['MakerNote LensMinMaxFocalMaxAperture'])
-        if re.match('.18',lensMinMaxFocal) != None and re.search('.*\s70',lensMinMaxFocal) != None :
-            lensName = '18-70mm f/3.5-4.5G'
-        elif re.match('.50',lensMinMaxFocal) != None and re.search('.*\s50',lensMinMaxFocal) != None:        
-            lensName = '50mm f/1.4D'
-        elif re.match('.105',lensMinMaxFocal) != None and re.search('.*\s105',lensMinMaxFocal) != None:
-            lensName = '105mm f/2.8D Micro'
-        elif re.match('.70',lensMinMaxFocal) != None and re.search('.*\s300',lensMinMaxFocal) != None:
-            lensName = '70-300mm f/4-5.6G'
-        else:
-            lensName = ''
-    else:
-        lensName = ''
-        
-    return lensName
-
-   
 def FilePic(rawFolder, base, filename, newName, y, m, d): 
     try:
         if os.path.isdir(base + '/' + y) != 1:
@@ -128,8 +106,6 @@ def AddDateInfoKeywords(im_name, rawFolder, filename, base, newName, y, m, d, hr
         dict = {0:'Monday',1:'Tuesday',2:'Wednesday',3:'Thursday',4:'Friday',
                 5:'Saturday',6:'Sunday'}
         day = dict[dd]
-        # Lens name
-        lens = GetLensType(rawFolder, filename)
         # Focal length
         fc = focalLen + 'mm'
         # Write our keywords to image
