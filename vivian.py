@@ -1,7 +1,4 @@
 import sys
-import calendar
-import traceback
-import re
 import exifread
 import os
 import shutil
