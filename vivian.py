@@ -2,12 +2,6 @@ import sys
 import exifread
 import os
 import shutil
- 
-base = '/Users/chad/Pictures'  # base dir 
-rawFolder = '/Users/chad/Pictures/exif_import'
-fileExt = '.JPG'
-filelist = os.listdir(rawFolder)
-count = 0
 
 class Vivian(object):
     def __init__(self, file):
