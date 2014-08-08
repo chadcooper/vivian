@@ -21,6 +21,16 @@ vivian is currently running on a headless Raspberry Pi Model B hooked up to 2
 
 ## Integration with box.com
 
+I wanted a solution where my wife and I could take photos with our phones and
+then file the "keepers" somehow. I decided to go the following route where you
+manually upload the files yourself to box.com. I'm sure you could setup a true
+sync to just automatically push all photos (I do this on my Android phone with
+Dropbox). Problem with that is that the vast majority of photos snapped with your
+phone are total crap, admit it. There are only a few good keepers worth filing.
+
+Also, I wanted to be able to upload photos taken with a real digital camera. Box
+lets me do that as well.
+
 box.com offers free accounts just as do Dropbox and Bitcasa, among others. What
 makes Box stand out is their support of the webDAV protocol, which is supported
 on Linux. You can essentially create a drive that is in sync with your Box
@@ -46,7 +56,11 @@ Finally, make mounting fully automatic. The Box cloud file system
 will be mounted to `/media/box` when the system boots, which makes it
 available at all times.
 
-Replace the line you have added to the file /etc/fstab with the following line:
+Edit file /etc/fstab:
+
+`$ sudo vim /etc/fstab`
+
+Add the following line:
 
 `https://dav.box.com/dav /media/box davfs rw,noexec,auto,user,async,_netdev,uid=pi,gid=pi 0 0`
 
