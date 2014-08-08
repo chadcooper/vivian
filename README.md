@@ -17,7 +17,7 @@ After the rename, photos are filed by date to directories like so:
 
 vivian is currently running on a headless Raspberry Pi Model B hooked up to 2
 1TB Samsung USB removable hard drives. vivian pushes to one drive, then a
-```rsync``` cronjob syncs to the second drive daily at 5AM, as a backup.
+`rsync` cronjob syncs to the second drive daily at 5AM, as a backup.
 
 ## Integration with box.com
 
@@ -30,32 +30,32 @@ All of the following commands were done under Raspian, so YMMV.
 
 First, create a directory for Box locally:
 
-```$ sudo mkdir /media/box```
+`$ sudo mkdir /media/box`
 
-Install ```davfs2```, a Linux tool for connecting to WebDAV shares as though they
+Install `davfs2`, a Linux tool for connecting to WebDAV shares as though they
 were local disks:
 
-```sudo apt-get install davfs2```
+`sudo apt-get install davfs2`
 
-Edit the file ```/etc/davfs2/secrets``` and add the next line at the bottom
+Edit the file `/etc/davfs2/secrets` and add the next line at the bottom
 of this file:
 
-```https://dav.box.com/dav username password```
+`https://dav.box.com/dav username password`
 
 Finally, make mounting fully automatic. The Box cloud file system
-will be mounted to ```/media/box``` when the system boots, which makes it
+will be mounted to `/media/box` when the system boots, which makes it
 available at all times.
 
 Replace the line you have added to the file /etc/fstab with the following line:
 
-```https://dav.box.com/dav /media/box davfs rw,noexec,auto,user,async,_netdev,uid=pi,gid=pi 0 0```
+`https://dav.box.com/dav /media/box davfs rw,noexec,auto,user,async,_netdev,uid=pi,gid=pi 0 0`
 
 ### Testing the Box setup
 
 On your phone or tablet, install the Box app for Android or iOS and login with
 your free account. Push some photos to the account.
 
-Back on the Pi, list the contents of the ```/media/box``` directory:
+Back on the Pi, list the contents of the `/media/box` directory:
 
 ```
 $ ls /media/box
@@ -82,8 +82,8 @@ So now we have:
 ### Software
 
 1. Vivian running on the Pi
-2. ```davfs2``` installed and running on the Pi
-3. Our box.com account wired up to a local directory via ```davfs2```
+2. `davfs2` installed and running on the Pi
+3. Our box.com account wired up to a local directory via `davfs2`
 4. Android/iOS apps on devices to push photos up to Box
 5. Drag-n-drop access to box.com on laptop through box.com website
 
@@ -95,23 +95,23 @@ run vivian every N minutes.
 I learned the hard way that editing the crontab in vim isn't a good idea - the
 changes don't take (I'm probably doing something wrong). So on the Pi, run:
 
-```$ crontab -e```
+`$ crontab -e`
 
 This opens up your crontab in nano. Add the following line:
 
-```*/30 * * * * /path/to/run_vivian.py```
+`*/30 * * * * /path/to/run_vivian.py`
 
-The above command executes the Python script ```run_vivian.py``` every 30 minutes
+The above command executes the Python script `run_vivian.py` every 30 minutes
 on the half hour.
 
-Be sure to make ```run_vivian.py``` executable:
+Be sure to make `run_vivian.py` executable:
 
-```$ chmod +x run_vivian.py```
+`$ chmod +x run_vivian.py`
 
-Make sure the shebang in ```run_vivian.py``` is correct for your system. On my
+Make sure the shebang in `run_vivian.py` is correct for your system. On my
 Pi it is:
 
-```#!/usr/bin/python```
+`#!/usr/bin/python`
 
 ## Creating mounts for 1TB backup drives
 
@@ -119,9 +119,9 @@ The following is how to mount the 1TB drives on the Pi.
 
 Get a list of all drives:
 
-```$ sudo fdisk -l```
+`$ sudo fdisk -l`
 
-My disks ended up being ```sda1``` and ```sdc1```
+My disks ended up being `sda1` and `sdc1`
 
 Make directories for the mounts we about to create:
 
@@ -141,15 +141,15 @@ $ pi@raspberrypi ~ $ sudo mount -t auto /dev/sdc1 /media/bu-2
 
 Install Samba
 
-```sudo apt-get install samba samba-common-bin```
+`sudo apt-get install samba samba-common-bin`
 
 Backup Samba config file:
 
-```sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.old```
+`sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.old`
 
 Edit the samba config file to add in our drive
 
-```$ sudo vim /etc/samba/smb.conf```
+`$ sudo vim /etc/samba/smb.conf`
 
 Add this:
 
@@ -167,7 +167,7 @@ read only = no
 
 Bounce Samba:
 
-```sudo /etc/init.d/samba restart```
+`sudo /etc/init.d/samba restart`
 
 
 Create backups user that can access the Pi's Samba shares:
@@ -181,7 +181,7 @@ Enter your password
 
 Add backups user to samba
 
-```$ sudo smbpasswd -a backups```
+`$ sudo smbpasswd -a backups`
 
 Enter your password
 
@@ -189,12 +189,12 @@ Enter your password
 
 In Finder, go to Go > Connect to Server, enter:
 
-```smb://10.0.1.50/backup-1/share```
+`smb://10.0.1.50/backup-1/share`
 
 
 ### Automount the drives on Pi when Pi boots
 
-```$ sudo vim /etc/fstab```
+`$ sudo vim /etc/fstab`
 
 Add these lines:
 
@@ -209,19 +209,19 @@ Now when the Pi boots, your drives get auto-mounted.
 ### Cron job to run rysnc daily at 5AM
 
 So we have backup-1 as our main target directory for photo storage, backup-2 is
-meant to mirror backup-1 for redundancy. Add a cron job to run ```rsync``` daily
+meant to mirror backup-1 for redundancy. Add a cron job to run `rsync` daily
 at 5AM to push deltas over:
 
-```$ vim crontab -e```
+`$ vim crontab -e`
 
 Add this line:
 
-```0 5 * * * rsync -av --delete /media/bu-1/share /media/bu-2/share/```
+`0 5 * * * rsync -av --delete /media/bu-1/share /media/bu-2/share/`
 
 ## Requirements
 
 * [EXIF.py](https://github.com/ianare/exif-py)
-* ```davfs2``` (install through ```apt-get```
+* `davfs2` (install through `apt-get`
 
 ## Sources
 
