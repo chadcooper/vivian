@@ -42,7 +42,6 @@ class Vivian(object):
         with open(filename, "rb") as file_stream:
             tags = EXIF.process_file(file_stream)
             datestr = str(tags["EXIF DateTimeDigitized"])
-            camera_make = str(tags["Image Make"]).replace(" ", "_")
             camera_model = str(tags["Image Model"]).replace(" ", "_")
 
             datestr = datestr.split(" ")
