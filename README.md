@@ -5,15 +5,15 @@ directories and it will look for jpegs in source, pull out the date/time
 digitized and camera model metadata from the EXIF headers, and rename the file
 using the metadata, to a format of:
 
-```CAMERA_MODEL_YYYY-MM-DD-hour-min-sec-AM/PM.jpg```
+`CAMERA_MODEL_YYYY-MM-DD-hour-min-sec-AM/PM.jpg`
 
 OR...
 
-```iPhone_5_2014-08-06_6-07-18-PM.jpg```
+`iPhone_5_2014-08-06_6-07-18-PM.jpg`
 
 After the rename, photos are filed by date to directories like so:
 
-```./2014/08/05/```
+`./2014/08/05/`
 
 vivian is currently running on a headless Raspberry Pi Model B hooked up to 2
 1TB Samsung USB removable hard drives. vivian pushes to one drive, then a
