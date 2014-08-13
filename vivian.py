@@ -40,41 +40,47 @@ class Vivian(object):
 
     def rename_file(self, filename):
         with open(filename, "rb") as file_stream:
-            tags = EXIF.process_file(file_stream)
-            datestr = str(tags["EXIF DateTimeDigitized"])
-            camera_model = str(tags["Image Model"]).replace(" ", "_")
+            try:
+                tags = EXIF.process_file(file_stream)
+                datestr = str(tags["EXIF DateTimeDigitized"])
+                camera_model = str(tags["Image Model"]).replace(" ", "_")
 
-            datestr = datestr.split(" ")
-            date = datestr[0]
-            time = datestr[1]
+                datestr = datestr.split(" ")
+                date = datestr[0]
+                time = datestr[1]
 
-            self.year = date.split(":")[0]
+                self.year = date.split(":")[0]
 
-            if len(date.split(":")[1]) < 2:
-                self.month = str("0") + str(date.split(":")[1])
-            else:
-                self.month = str(date.split(":")[1])
+                if len(date.split(":")[1]) < 2:
+                    self.month = str("0") + str(date.split(":")[1])
+                else:
+                    self.month = str(date.split(":")[1])
 
-            if len(date.split(":")[2]) < 2:
-                self.day = str("0") + str(date.split(":")[2])
-            else:
-                self.day = str(date.split(":")[2])
+                if len(date.split(":")[2]) < 2:
+                    self.day = str("0") + str(date.split(":")[2])
+                else:
+                    self.day = str(date.split(":")[2])
 
-            if int(time.split(":")[0]) < 13:
-                hour = str(time.split(":")[0])
-                am_pm = "AM"
-            elif int(time.split(":")[0]) > 12:
-                hour = str((int(time.split(":")[0]) - 12))
-                am_pm = "PM"
+                if int(time.split(":")[0]) < 13:
+                    hour = str(time.split(":")[0])
+                    am_pm = "AM"
+                elif int(time.split(":")[0]) > 12:
+                    hour = str((int(time.split(":")[0]) - 12))
+                    am_pm = "PM"
 
-            min = str(time.split(":")[1])
-            sec = str(time.split(":")[2])
+                min = str(time.split(":")[1])
+                sec = str(time.split(":")[2])
 
-            self.new_name = (camera_model + "_" + self.year + "-" +
-                        self.month + "-" + self.day + "_" + hour + "-" +
-                        min + "-" + sec + "-" + am_pm + ".jpg")
+                self.new_name = (camera_model + "_" + self.year + "-" +
+                            self.month + "-" + self.day + "_" + hour + "-" +
+                            min + "-" + sec + "-" + am_pm + ".jpg")
 
-        return self.new_name
+                return self.new_name
+
+            except KeyError:
+                sys.stderr.write("Key error ")
+                self.log.error("Key error ")
+                pass
 
 
     def create_directory(self, directory):
