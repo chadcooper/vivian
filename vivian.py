@@ -88,32 +88,36 @@ class Vivian(object):
             os.makedirs(directory)
 
 
-    def delete_photo(self, photo):
-        os.remove(os.path.join(self.src, photo))
+    def delete_media_file(self, media_file):
+        os.remove(os.path.join(self.src, media_file))
 
 
-    def file_photos(self):
+    def file_media_files(self):
         for f in self.fetch_files():
             if f.lower().endswith(".jpg"):
-                if self.file_photo(f):
-                    self.delete_photo(f)
+                if self.file_media_file(f, "photo"):
+                    self.delete_media_file(f)
+            elif f.lower().endswith((".mov", ".mp4")):
+                self.file_media_file(f, "video")
+                    #self.delete_media_file(f)
 
 
-    def file_photo(self, photo):
+    def file_media_file(self, media_file, media_type):
         try:
-            self.renamed_photo = self.rename_file(os.path.join(self.src, photo))
-            new_dir = os.path.join(self.dest, self.year, self.month, self.day)
-            if not os.path.isfile(os.path.join(new_dir, self.renamed_photo)):
+            self.renamed_media_file = self.rename_file(os.path.join(self.src, media_file), media_type)
+            print self.renamed_media_file
+            new_dir = os.path.join(self.dest, media_type, self.year, self.month, self.day)
+            if not os.path.isfile(os.path.join(new_dir, self.renamed_media_file)):
                 self.create_directory(new_dir)
-                shutil.copyfile(os.path.join(self.src, photo),
-                                os.path.join(new_dir, self.renamed_photo))
-                self.log.info(photo + " copied to " + os.path.join(new_dir, self.renamed_photo))
+                shutil.copyfile(os.path.join(self.src, media_file),
+                                os.path.join(new_dir, self.renamed_media_file))
+                self.log.info(media_file + " copied to " + os.path.join(new_dir, self.renamed_media_file))
                 return 1
             else:
                 # Quarantine dups
-                shutil.copyfile(os.path.join(self.src, photo),
-                                os.path.join(self.dest, self.dups_dir, photo))
-                self.log.warning("DUPLICATE: " + photo + " -- " + self.year + "/" +
+                shutil.copyfile(os.path.join(self.src, media_file),
+                                os.path.join(self.dest, self.dups_dir, media_file))
+                self.log.warning("DUPLICATE: " + media_file + " -- " + self.year + "/" +
                             self.month + "/" + self.day)
                 return 1
         except Exception, err:
