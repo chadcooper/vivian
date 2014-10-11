@@ -4,6 +4,8 @@ import os
 import shutil
 import logging
 import logging.handlers
+import datetime
+import struct
 
 
 class Logger(object):
@@ -38,49 +40,87 @@ class Vivian(object):
         return files
 
 
-    def rename_file(self, filename):
-        with open(filename, "rb") as file_stream:
-            try:
-                tags = EXIF.process_file(file_stream)
-                datestr = str(tags["EXIF DateTimeDigitized"])
-                camera_model = str(tags["Image Model"]).replace(" ", "_")
+    def get_video_date(self, filename):
+        ATOM_HEADER_SIZE = 8
+        # difference between Unix epoch and QuickTime epoch, in seconds
+        EPOCH_ADJUSTER = 2082844800
 
-                datestr = datestr.split(" ")
-                date = datestr[0]
-                time = datestr[1]
+        # open file and search for moov item
+        f = open(filename, "rb")
+        while 1:
+            atom_header = f.read(ATOM_HEADER_SIZE)
+            if atom_header[4:8] == 'moov':
+                break
+            else:
+                atom_size = struct.unpack(">I", atom_header[0:4])[0]
+                f.seek(atom_size - 8, 1)
+        # found 'moov', look for 'mvhd' and timestamps
+        atom_header = f.read(ATOM_HEADER_SIZE)
+        if atom_header[4:8] == 'cmov':
+            print "moov atom is compressed"
+        elif atom_header[4:8] != 'mvhd':
+            print "expected to find 'mvhd' header"
+        else:
+            f.seek(4, 1)
+            creation_date = struct.unpack(">I", f.read(4))[0]
+            modification_date = struct.unpack(">I", f.read(4))[0]
+            video_cdate = datetime.datetime.utcfromtimestamp(creation_date - EPOCH_ADJUSTER)
+            #raw_date_object = datetime.datetime.strptime(video_cdate, "%Y-%m-%d %H:%M:%S")
+            formatted_date = datetime.datetime.strftime(video_cdate, "%Y-%m-%d_%I-%M-%S_%p")
+            self.year = str(video_cdate.year)
+            self.month = str(video_cdate.month)
+            self.day = str(video_cdate.day)
 
-                self.year = date.split(":")[0]
+        return formatted_date
 
-                if len(date.split(":")[1]) < 2:
-                    self.month = str("0") + str(date.split(":")[1])
-                else:
-                    self.month = str(date.split(":")[1])
 
-                if len(date.split(":")[2]) < 2:
-                    self.day = str("0") + str(date.split(":")[2])
-                else:
-                    self.day = str(date.split(":")[2])
+    def rename_file(self, filename, media_type):
+        if media_type == "photo":
+            with open(filename, "rb") as file_stream:
+                try:
+                    tags = EXIF.process_file(file_stream)
+                    datestr = str(tags["EXIF DateTimeDigitized"])
+                    camera_model = str(tags["Image Model"]).replace(" ", "_")
 
-                if int(time.split(":")[0]) < 13:
-                    hour = str(time.split(":")[0])
-                    am_pm = "AM"
-                elif int(time.split(":")[0]) > 12:
-                    hour = str((int(time.split(":")[0]) - 12))
-                    am_pm = "PM"
+                    datestr = datestr.split(" ")
+                    date = datestr[0]
+                    time = datestr[1]
 
-                min = str(time.split(":")[1])
-                sec = str(time.split(":")[2])
+                    self.year = date.split(":")[0]
 
-                self.new_name = (camera_model + "_" + self.year + "-" +
-                            self.month + "-" + self.day + "_" + hour + "-" +
-                            min + "-" + sec + "-" + am_pm + ".jpg")
+                    if len(date.split(":")[1]) < 2:
+                        self.month = str("0") + str(date.split(":")[1])
+                    else:
+                        self.month = str(date.split(":")[1])
 
-                return self.new_name
+                    if len(date.split(":")[2]) < 2:
+                        self.day = str("0") + str(date.split(":")[2])
+                    else:
+                        self.day = str(date.split(":")[2])
 
-            except KeyError:
-                sys.stderr.write("Key error ")
-                self.log.error("Key error ")
-                pass
+                    if int(time.split(":")[0]) < 13:
+                        hour = str(time.split(":")[0])
+                        am_pm = "AM"
+                    elif int(time.split(":")[0]) > 12:
+                        hour = str((int(time.split(":")[0]) - 12))
+                        am_pm = "PM"
+
+                    min = str(time.split(":")[1])
+                    sec = str(time.split(":")[2])
+
+                    self.new_name = (camera_model + "_" + self.year + "-" +
+                                self.month + "-" + self.day + "_" + hour + "-" +
+                                min + "-" + sec + "-" + am_pm + ".jpg")
+                except KeyError:
+                    sys.stderr.write("Key error ")
+                    self.log.error("Key error ")
+                    pass
+        else:
+            video_filename  = self.get_video_date(filename)
+            video_root, video_ext = os.path.splitext(filename)
+            self.new_name = video_filename + video_ext
+
+        return self.new_name
 
 
     def create_directory(self, directory):
