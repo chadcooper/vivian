@@ -1,15 +1,24 @@
 # vivian
 
-vivian is a digital photo renamer and filer. Give it source and destination
-directories and it will look for jpegs in source, pull out the date/time
-digitized and camera model metadata from the EXIF headers, and rename the file
-using the metadata, to a format of:
+vivian is a digital media renamer and filer. Give it source and destination
+directories and it will look for jpegs, MOVs, and mp4s in source. For photos,
+it will pull out the date/time digitized and camera model metadata from the EXIF
+headers and rename the file using the metadata, to a format of:
 
 `CAMERA_MODEL_YYYY-MM-DD-hour-min-sec-AM/PM.jpg`
 
 OR...
 
 `iPhone_5_2014-08-06_6-07-18-PM.jpg`
+
+For video files, it get the video creation time from the atom header and renames
+the file to:
+
+`YYYY-MM-DD-hour-min-sec-AM/PM.mp4`
+
+OR...
+
+`2014-08-06_6-07-18-PM.mp4`
 
 After the rename, photos are filed by date to directories like so:
 
@@ -29,7 +38,8 @@ Dropbox). Problem with that is that the vast majority of photos snapped with you
 phone are total crap, admit it. There are only a few good keepers worth filing.
 
 Also, I wanted to be able to upload photos taken with a real digital camera. Box
-lets me do that as well.
+lets me do that as well by just sorting out the keepers on my laptop, then
+uploading them to box.
 
 box.com offers free accounts just as do Dropbox and Bitcasa, among others. What
 makes Box stand out is their support of the webDAV protocol, which is supported
@@ -235,7 +245,7 @@ Add this line:
 ## Requirements
 
 * [EXIF.py](https://github.com/ianare/exif-py)
-* `davfs2` (install through `apt-get`
+* `davfs2` (install through `apt-get`)
 
 ## Sources
 
