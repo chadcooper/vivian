@@ -42,10 +42,8 @@ class Vivian(object):
 
     def get_video_date(self, filename):
         ATOM_HEADER_SIZE = 8
-        # difference between Unix epoch and QuickTime epoch, in seconds
+        # Difference between Unix epoch and QuickTime epoch, in seconds
         EPOCH_ADJUSTER = 2082844800
-
-        # open file and search for moov item
         f = open(filename, "rb")
         while 1:
             atom_header = f.read(ATOM_HEADER_SIZE)
@@ -54,7 +52,7 @@ class Vivian(object):
             else:
                 atom_size = struct.unpack(">I", atom_header[0:4])[0]
                 f.seek(atom_size - 8, 1)
-        # found 'moov', look for 'mvhd' and timestamps
+        # Found 'moov', look for 'mvhd' and timestamps
         atom_header = f.read(ATOM_HEADER_SIZE)
         if atom_header[4:8] == 'cmov':
             print "moov atom is compressed"
@@ -65,7 +63,6 @@ class Vivian(object):
             creation_date = struct.unpack(">I", f.read(4))[0]
             modification_date = struct.unpack(">I", f.read(4))[0]
             video_cdate = datetime.datetime.utcfromtimestamp(creation_date - EPOCH_ADJUSTER)
-            #raw_date_object = datetime.datetime.strptime(video_cdate, "%Y-%m-%d %H:%M:%S")
             formatted_date = datetime.datetime.strftime(video_cdate, "%Y-%m-%d_%I-%M-%S_%p")
             self.year = str(video_cdate.year)
             self.month = str(video_cdate.month)
@@ -80,45 +77,25 @@ class Vivian(object):
                 try:
                     tags = EXIF.process_file(file_stream)
                     datestr = str(tags["EXIF DateTimeDigitized"])
+                    date_object = datetime.datetime.strptime(datestr,
+                                                             "%Y:%m:%d %H:%M:%S")
+                    formatted_date = datetime.datetime.strftime(date_object,
+                                                                "%Y-%m-%d_%I-%M-%S_%p")
+                    self.year = str(date_object.year)
+                    self.month = str(date_object.month)
+                    self.day = str(date_object.day)
+
                     camera_model = str(tags["Image Model"]).replace(" ", "_")
 
-                    datestr = datestr.split(" ")
-                    date = datestr[0]
-                    time = datestr[1]
-
-                    self.year = date.split(":")[0]
-
-                    if len(date.split(":")[1]) < 2:
-                        self.month = str("0") + str(date.split(":")[1])
-                    else:
-                        self.month = str(date.split(":")[1])
-
-                    if len(date.split(":")[2]) < 2:
-                        self.day = str("0") + str(date.split(":")[2])
-                    else:
-                        self.day = str(date.split(":")[2])
-
-                    if int(time.split(":")[0]) < 13:
-                        hour = str(time.split(":")[0])
-                        am_pm = "AM"
-                    elif int(time.split(":")[0]) > 12:
-                        hour = str((int(time.split(":")[0]) - 12))
-                        am_pm = "PM"
-
-                    min = str(time.split(":")[1])
-                    sec = str(time.split(":")[2])
-
-                    self.new_name = (camera_model + "_" + self.year + "-" +
-                                self.month + "-" + self.day + "_" + hour + "-" +
-                                min + "-" + sec + "-" + am_pm + ".jpg")
+                    self.new_name = camera_model + "_" + formatted_date + ".jpg"
                 except KeyError:
-                    sys.stderr.write("Key error ")
-                    self.log.error("Key error ")
+                    sys.stderr.write("Key error reading EXIF tags")
+                    self.log.error("Key error reading EXIF tags")
                     pass
         else:
             video_filename  = self.get_video_date(filename)
             video_root, video_ext = os.path.splitext(filename)
-            self.new_name = video_filename + video_ext
+            self.new_name = video_filename + video_ext.lower()
 
         return self.new_name
 
@@ -135,8 +112,8 @@ class Vivian(object):
     def file_media_files(self):
         for f in self.fetch_files():
             if f.lower().endswith(".jpg"):
-                if self.file_media_file(f, "photo"):
-                    self.delete_media_file(f)
+                self.file_media_file(f, "photo")
+                    #self.delete_media_file(f)
             elif f.lower().endswith((".mov", ".mp4")):
                 self.file_media_file(f, "video")
                     #self.delete_media_file(f)
@@ -146,7 +123,7 @@ class Vivian(object):
         try:
             self.renamed_media_file = self.rename_file(os.path.join(self.src, media_file), media_type)
             print self.renamed_media_file
-            new_dir = os.path.join(self.dest, media_type, self.year, self.month, self.day)
+            new_dir = os.path.join(self.dest, self.year, self.month, self.day)
             if not os.path.isfile(os.path.join(new_dir, self.renamed_media_file)):
                 self.create_directory(new_dir)
                 shutil.copyfile(os.path.join(self.src, media_file),
