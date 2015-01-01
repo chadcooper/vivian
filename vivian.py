@@ -19,7 +19,7 @@ class Logger(object):
         handler = logging.handlers.RotatingFileHandler(self.log_filename,
                                                        maxBytes=20000,
                                                        backupCount=5)
-        frmt = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        frmt = logging.Formatter("%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s")
         handler.setFormatter(frmt)
         log.addHandler(handler)
 
@@ -55,9 +55,9 @@ class Vivian(object):
         # Found 'moov', look for 'mvhd' and timestamps
         atom_header = f.read(ATOM_HEADER_SIZE)
         if atom_header[4:8] == 'cmov':
-            print "moov atom is compressed"
+            self.log.info("moov atom is compressed")
         elif atom_header[4:8] != 'mvhd':
-            print "expected to find 'mvhd' header"
+            self.log.info("expected to find 'mvhd' header")
         else:
             f.seek(4, 1)
             creation_date = struct.unpack(">I", f.read(4))[0]
