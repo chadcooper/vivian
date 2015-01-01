@@ -112,11 +112,11 @@ class Vivian(object):
     def file_media_files(self):
         for f in self.fetch_files():
             if f.lower().endswith(".jpg"):
-                self.file_media_file(f, "photo")
-                    #self.delete_media_file(f)
+                if self.file_media_file(f, "photo"):
+                    self.delete_media_file(f)
             elif f.lower().endswith((".mov", ".mp4")):
-                self.file_media_file(f, "video")
-                    #self.delete_media_file(f)
+                if self.file_media_file(f, "video"):
+                    self.delete_media_file(f)
 
 
     def file_media_file(self, media_file, media_type):
