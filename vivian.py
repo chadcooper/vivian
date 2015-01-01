@@ -87,7 +87,13 @@ class Vivian(object):
 
                     camera_model = str(tags["Image Model"]).replace(" ", "_")
 
-                    self.new_name = camera_model + "_" + formatted_date + ".jpg"
+                    image_filename = os.path.split(filename)[1]
+                    if image_filename.startswith("DSC"):
+                        image_filename_base = os.path.splitext(image_filename)[0]
+                        self.new_name = (camera_model + "_" + image_filename_base[4:] + "_" +
+                                         formatted_date + ".jpg")
+                    else:
+                        self.new_name = camera_model + "_" + formatted_date + ".jpg"
                 except KeyError:
                     sys.stderr.write("Key error reading EXIF tags")
                     self.log.error("Key error reading EXIF tags")
