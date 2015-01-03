@@ -1,6 +1,6 @@
 # vivian
 
-vivian is a digital media renamer and filer. Give it source and destination
+vivian is a digital media renamer and filer written in Python. Give it source and destination
 directories and it will look for jpegs, MOVs, and mp4s in source. For photos,
 it will pull out the date/time digitized and camera model metadata from the EXIF
 headers and rename the file using the metadata, to a format of:
@@ -10,6 +10,14 @@ headers and rename the file using the metadata, to a format of:
 OR...
 
 `iPhone_5_2014-08-06_6-07-18-PM.jpg`
+
+OR...
+
+in the case of DSLR (Nikon in my case), add in the photo number from the original
+camera filename (usually something such as `DSC_1234`) to deal with burst shots
+that have the exact same timestamp:
+
+`CAMERA_MODEL_<photo_number>_YYYY-MM-DD-hour-min-sec-AM/PM.jpg`
 
 For video files, it get the video creation time from the atom header and renames
 the file to:
