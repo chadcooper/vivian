@@ -81,9 +81,10 @@ class Vivian(object):
                                                              "%Y:%m:%d %H:%M:%S")
                     formatted_date = datetime.datetime.strftime(date_object,
                                                                 "%Y-%m-%d_%I-%M-%S_%p")
-                    self.year = str(date_object.year)
-                    self.month = str(date_object.month)
-                    self.day = str(date_object.day)
+
+                    self.year = str(datetime.datetime.strftime(date_object, "%Y"))
+                    self.month = str(datetime.datetime.strftime(date_object, "%m"))
+                    self.day = str(datetime.datetime.strftime(date_object, "%d"))
 
                     camera_model = str(tags["Image Model"]).replace(" ", "_")
 
