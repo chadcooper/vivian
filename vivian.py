@@ -64,9 +64,9 @@ class Vivian(object):
             modification_date = struct.unpack(">I", f.read(4))[0]
             video_cdate = datetime.datetime.utcfromtimestamp(creation_date - EPOCH_ADJUSTER)
             formatted_date = datetime.datetime.strftime(video_cdate, "%Y-%m-%d_%I-%M-%S_%p")
-            self.year = str(video_cdate.year)
-            self.month = str(video_cdate.month)
-            self.day = str(video_cdate.day)
+            self.year = str(datetime.datetime.strftime(video_cdate, "%Y"))
+            self.month = str(datetime.datetime.strftime(video_cdate, "%m"))
+            self.day = str(datetime.datetime.strftime(video_cdate, "%d"))
 
         return formatted_date
 
